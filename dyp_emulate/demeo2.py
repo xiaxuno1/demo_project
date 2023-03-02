@@ -31,4 +31,23 @@ def lchk_sum():
     return lchksum
 if __name__ == '__main__':
     print(lchk_sum())
+    data = 'hello ..你好'
+    data1 = b'68656C6C6F202E2EE4BDA0E5A5BD'
+    data2 = b'hello ..\xe4\xbd\xa0\xe5\xa5\xbd'
+    data3 = '01234567abcd' #ascii码
+    print(base64.b16decode(data1)) #解码 Base16 编码的类似字节的对象或 ASCII 字符串。b'hello ..\xe4\xbd\xa0\xe5\xa5\xbd'
+    print(base64.b16encode(data2)) #编码类字节流对象返回字节流b'68656C6C6F202E2EE4BDA0E5A5BD'
+    print(data.encode(encoding='utf8'))#b'hello ..\xe4\xbd\xa0\xe5\xa5\xbd'
+    print(data3.encode())    #b'01234567abcd'
+    print(base64.b16encode(data3.encode())) #将字节流编码为16进制形式
+    print(bytes.fromhex('7e')+data1)
+    print("-"*50)
+    data4 = 1057
+    data5 = 64478
+    x = data4%0xff
+    y = ~x
+    z =y+1
+    print(x,y,z)
+
+
 

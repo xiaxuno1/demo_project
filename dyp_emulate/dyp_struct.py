@@ -81,27 +81,32 @@ class DYPChck:
         """
         定义计算checksum方法
         CHKSUM的计算是除SOI、EOI和CHKSUM外，其他字符ASCII码值累加求和，所得结果模65535余数取反加1
-        :param info_length: info字节长度的ascii形式
+        :param info_length: info字节长度的ascii形式(字符串)
         :return: checksum的int表示
         """
         checksum = 0
         for i in self.equ_type:
-            checksum +=i
+            checksum +=ord(i)
         for i in self.info_type:
-            checksum +=i
+            checksum +=ord(i)
         for i in info_length:
-            checksum +=i
+            checksum +=ord(i)
         for i in self.info:
-            checksum +=i
-        checksum = (~checksum % 65535) + 1  # 注意这里的括号，因为+-的优先级要高于^ &的优先级
-        return checksum
+            checksum +=ord(i)
+        checksum = (~checksum % 65535) + 1  # 注意这里的括号，因为+-%的优先级要高于^ &的优先级
+        #注意这里多的+1因为有符号的原因导致计算出问题
+        return checksum+1
 
     def dyp_package(self,info_length,checksum):
         """
-        根据协议各个部分组包,接收16进制格式的字符串
+        soi/eoi传入的是16进制的字符串，其余传入的是ascii码表示的字符串
         :return:组包完成的字节流
         """
-        pkg = bytes.fromhex(self.soi+self.equ_type+self.info_type+info_length+self.info+checksum+self.eoi)
+        pkg = b''
+        pkg = pkg + base64.b16encode(bytes.fromhex(self.soi))
+        strs = self.equ_type+self.info_type+info_length+self.info+checksum #除去soi/eoi后，都是字符串
+        pkg = pkg + base64.b16encode(strs.encode()) #将字符串形式的字节码，按照ascii码的形式转换为字节流，再编码为16进制表示
+        pkg = pkg +base64.b16encode(bytes.fromhex(self.eoi))
         return pkg
 
 
