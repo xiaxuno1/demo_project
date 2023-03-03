@@ -37,6 +37,7 @@ class INFOCode(Enum):
     FACINOFO = '51'
     USERDEFINE = '80'
 
+
 def input_sim():
     equ_type = EquCode.INPUT.value
     info_type = INFOCode.SIMULATION.value
@@ -45,7 +46,7 @@ def input_sim():
     dyp = dyp_struct.DYPChck(equ_type = equ_type,info_type = info_type,info = info)
     info_length = base64.b16encode(struct.pack('>H',dyp.info_length())).decode()  #将接收的整型转换为16进制字符串
     checksum = base64.b16encode(struct.pack('>H',dyp.checksum(info_length))).decode() #先传高字节
-    return  dyp.dyp_package(info_length,checksum)
+    return dyp.dyp_package(info_length,checksum)
 
 def input_ac_toucher():
     equ_type = EquCode.INPUT.value
