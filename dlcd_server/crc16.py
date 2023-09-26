@@ -11,7 +11,7 @@ import base64
 import struct
 
 
-def crc16(bytes_data,poly= 0xA001,init_crc = 0xffff):
+def crc_16(bytes_data,poly= 0xA001,init_crc = 0xffff):
     """
     定义crc16计算方法的实现，通过不同的多项式，初始值，实现不同模型计算
     :return crc16的数值
@@ -83,6 +83,6 @@ class CRC16_XMODEM():
 if __name__ == '__main__':
     ls = '0E 03 00 04 00 01 00 01 00 01 00 01'
     #print(bytes.fromhex(ls))
-    crc = crc16(ls)
+    crc = crc_16(ls)
     print(base64.b16encode(struct.pack('<H',crc)).decode()) #struct编码再转换
 
