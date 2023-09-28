@@ -8,6 +8,7 @@
 # Description:配置文件的读取操作 .ini文件
 # ---------------------------------------------------
 import config,configparser
+from BjlxBS.base.function import project_path
 
 class INIOp:
     '''
@@ -15,7 +16,7 @@ class INIOp:
     '''
     def __init__(self):
         self.cfg = configparser.ConfigParser()
-        self.cfg.read('.\\cfg_data\\BjlxSet1.ini',encoding='ansi')
+        self.cfg.read(project_path()+'\\cfg_data\\BjlxSet1.ini',encoding='ansi')
 
     def get_sections(self):
         return self.cfg.sections()

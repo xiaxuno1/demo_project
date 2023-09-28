@@ -61,7 +61,7 @@ class BJLX:
         self._ack_code = bytes.fromhex(ack_code)
 
     def set_len(self): #整帧长度
-        if(len(self._data)):
+        if(len(self._data) or self._func_code == b'\x46'): #校时数据无
             self._data_len=bytes.fromhex(hex(len(self._data)+8)[2:].zfill(2))
         else:
             print('data为空')

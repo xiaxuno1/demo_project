@@ -43,9 +43,9 @@ class Status(BJLX):
         infos = self.cfg.get_info("继电器开关量")
         #全体设备的序号和状态
         for i in range(1,len(infos)):
-            jdq_ori = ((len(infos)-1)//35)+1 #设备方向
-            jdq_num = i % 35 #继电器编号
-            jdq_index = jdq_ori&0xc0+jdq_num&0x3f #继电器序号，位操作2+6
+            jdq_ori = ((i-1)//35)+1 #设备方向
+            jdq_num = ((i-1) % 35) #继电器编号;i应该从0开始
+            jdq_index = ((jdq_ori<<6)&0xc0)+(jdq_num&0x3f) #继电器序号，位操作2+6
             status = eval(infos[i][-1]) #继电器状态 0/1
             self._data = self._data+ bytes.fromhex(hex(jdq_index)[2:].zfill(2))+bytes.fromhex(hex(status)[2:].zfill(2))
         self.set_len()  #计算长度
