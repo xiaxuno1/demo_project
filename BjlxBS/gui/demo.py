@@ -2,17 +2,14 @@
 # coding=utf8
 # !/usr/bin/python
 # PN: test_tool
-# FN: app
+# FN: demo
 # Author: xiaxu
-# DATA: 2023/9/27
+# DATA: 2023/9/28
 # Description:
 # ---------------------------------------------------
 import tkinter
-from tkinter import *
+import tkinter.messagebox
 import customtkinter
-from tkinter import messagebox
-from BjlxBS.equipment_status import Status
-
 
 customtkinter.set_appearance_mode("System")  # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_default_color_theme("blue")  # Themes: "blue" (standard), "green", "dark-blue"
@@ -23,12 +20,12 @@ class App(customtkinter.CTk):
         super().__init__()
 
         # configure window
-        self.title("接口仿真")
+        self.title("CustomTkinter complex_example.py")
         self.geometry(f"{1100}x{580}")
 
-        # configure grid layout (3*3)
+        # configure grid layout (1*2)
         self.grid_columnconfigure(1, weight=1)
-        self.grid_columnconfigure((2,), weight=0)
+        self.grid_columnconfigure((2, 3), weight=0)
         self.grid_rowconfigure((0, 1, 2), weight=1)
 
         # create sidebar frame with widgets
@@ -79,9 +76,9 @@ class App(customtkinter.CTk):
         self.optionmenu_1 = customtkinter.CTkOptionMenu(self.tabview.tab("CTkTabview"), dynamic_resizing=False,
                                                         values=["Value 1", "Value 2", "Value Long Long Long"])
         self.optionmenu_1.grid(row=0, column=0, padx=20, pady=(20, 10))
-        self.combox_data_type = customtkinter.CTkComboBox(self.tabview.tab("CTkTabview"),
-                                                    values=["继电器开关量", "报警开关量", "校时信息"],command=self.set_content)
-        self.combox_data_type.grid(row=1, column=0, padx=20, pady=(10, 10))
+        self.combobox_1 = customtkinter.CTkComboBox(self.tabview.tab("CTkTabview"),
+                                                    values=["Value 1", "Value 2", "Value Long....."])
+        self.combobox_1.grid(row=1, column=0, padx=20, pady=(10, 10))
         self.string_input_button = customtkinter.CTkButton(self.tabview.tab("CTkTabview"), text="Open CTkInputDialog",
                                                            command=self.open_input_dialog_event)
         self.string_input_button.grid(row=2, column=0, padx=20, pady=(10, 10))
@@ -123,7 +120,13 @@ class App(customtkinter.CTk):
         self.scrollable_frame = customtkinter.CTkScrollableFrame(self, label_text="CTkScrollableFrame")
         self.scrollable_frame.grid(row=1, column=2, padx=(0, 0), pady=(20, 0), sticky="nsew")
         self.scrollable_frame.grid_columnconfigure(0, weight=1)
-
+        self.scrollable_frame_switches = []
+        for i in range(100):
+            switch = customtkinter.CTkSwitch(master=self.scrollable_frame, text=f"CTkSwitch {i}")
+            entry = customtkinter.CTkEntry(master=self.scrollable_frame)
+            entry.grid(row=i, column=1, padx=10, pady=(0, 20))
+            switch.grid(row=i, column=0, padx=10, pady=(0, 20))
+            self.scrollable_frame_switches.append(switch)
 
 
         # create checkbox and switch frame
@@ -140,11 +143,13 @@ class App(customtkinter.CTk):
         self.sidebar_button_3.configure(state="disabled", text="Disabled CTkButton")
         self.checkbox_3.configure(state="disabled")
         self.checkbox_1.select()
+        self.scrollable_frame_switches[0].select()
+        self.scrollable_frame_switches[4].select()
         self.radio_button_3.configure(state="disabled")
         self.appearance_mode_optionemenu.set("Dark")
         self.scaling_optionemenu.set("100%")
         self.optionmenu_1.set("CTkOptionmenu")
-        self.combox_data_type.set("数据类型")
+        self.combobox_1.set("CTkComboBox")
         self.slider_1.configure(command=self.progressbar_2.set)
         self.slider_2.configure(command=self.progressbar_3.set)
         self.progressbar_1.configure(mode="indeterminnate")
@@ -170,31 +175,7 @@ class App(customtkinter.CTk):
     def get_entry(self):
         print("输入内容：",self.entry.get())
 
-    def set_content(self,choice):
-        #choice = self.combox_data_type.get()
-        print("获取数据：", choice)
-        self.textbox = customtkinter.CTkTextbox(master=self.scrollable_frame,width=100, corner_radius=0,activate_scrollbars=False)
-        self.textbox.grid(row=0, column=0, sticky="nsew")
-        if choice == "继电器开关量":
-            infos = Status().cfg.get_info('继电器开关量')
-            #self.label = Listbox(self.scrollable_frame,width = 20,height = 20)
-            for i in range(1, len(infos)):
-                list_data = infos[i][0]+" "+infos[i][1]+" "*10
-                self.textbox.insert(str(i)+'.'+"0",list_data)
-                self.textbox.insert(str(i)+"."+"40",infos[i][-1]+"\n")
-            print(self.textbox.get("1.0","2.0"))
-        elif choice == "报警开关量":
-            infos = Status().cfg.get_info('报警开关量')
-            self.lb = Listbox(self)
-            self.lb.grid(row = 1,column = 0)
-            for i in range(1, len(infos)):
-                list_data = (infos[i][0],infos[i][1],infos[i][-1])
-                self.lb.insert(i,list_data)
-        elif choice == '校时信息':
-            self.lb.insert(0,'校时信息')
 
-
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     app = App()
     app.mainloop()

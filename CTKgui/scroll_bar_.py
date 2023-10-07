@@ -49,5 +49,21 @@ switch = customtkinter.CTkSwitch(app, text="CTkSwitch", command=switch_event,
                                  variable=switch_var, onvalue="on", offvalue="off")
 switch.grid(row=3, column=1, sticky="sn")
 
+#输入框
+entry = customtkinter.CTkEntry(app, placeholder_text="CTkEntry")
+entry.grid(row=3, column=0, sticky="sn")
+print(entry.cget('placeholder_text'))
+
+
+#combox
+def combobox_callback(choice):
+    print("combobox dropdown clicked:", choice)
+
+combobox_var = customtkinter.StringVar(value="option 2")
+combobox = customtkinter.CTkComboBox(app, values=["option 1", "option 2"],
+                                     command=combobox_callback, variable=combobox_var)
+combobox_var.set("option 2")
+combobox.grid(row=2, column=0, sticky="sn")
+
 
 app.mainloop()
