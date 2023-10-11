@@ -7,15 +7,28 @@
 # DATA: 2023/9/21
 # Description:告警信息
 # ---------------------------------------------------
+import time
+
 from  BjlxBS.bjlx import BJLX
 from BjlxBS.base.cfg_info import CFGInfo
+from BjlxBS import observer
+from BjlxBS.file_info_update import FileUpdate
 
 
-class Alarm(BJLX):
+class Alarm(BJLX,observer.Observer):
     def __init__(self):
         super().__init__()
         self.set_func_code('41')
         self._data = b''
+        self.cfg = CFGInfo()
+        self.set_alarm_data()
+        self.set_len()
+        self.set_bcc_code()
+
+    def update(self, subject: FileUpdate) -> None:
+        #更新文件内容
+        self.cfg = CFGInfo()
+        self._data = b'' #重新初始化，读数据，生成数据，算长度、bcc
         self.cfg = CFGInfo()
         self.set_alarm_data()
         self.set_len()
@@ -36,7 +49,16 @@ class Alarm(BJLX):
 if __name__ == '__main__':
     #组装包
     alarm = Alarm()
+    file_info = FileUpdate() #观察目标
+    file_info.attach(alarm) #添加观察者
     print(alarm.pkg())
+    while True:
+        time.sleep(5) #5s检测一次
+        if file_info.isfile_update():
+            print("文件更新")
+            print(alarm.pkg())
+            break
+
 
 
 

@@ -16,7 +16,8 @@ class INIOp:
     '''
     def __init__(self):
         self.cfg = configparser.ConfigParser()
-        self.cfg.read(project_path()+'\\cfg_data\\BjlxSet1.ini',encoding='ansi')
+        #project_path()+'\\cfg_data\\BjlxSet1.ini',encoding='ansi' 改用相对路径解决exe报错
+        self.cfg.read('.\\cfg_data\\BjlxSet1.ini')
 
     def get_sections(self):
         return self.cfg.sections()

@@ -22,7 +22,7 @@ class FrameLog():
         self.logger.setLevel(logging.DEBUG)
         #创建handler，用于设置日志格式
         self.log_time = time.strftime('%Y%m%d')
-        self.log_path = project_path()+'/log/'
+        self.log_path = './log/'#project_path()+'/log/' 改用相对路径，因为转化为程序报错
         self.log_name = self.log_path+self.log_time+'log.log'
         print(self.log_name)
         fh = logging.FileHandler(self.log_name,'a',encoding='utf-8') #设置输出文档的位置
