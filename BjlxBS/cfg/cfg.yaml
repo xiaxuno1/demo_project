@@ -1,0 +1,10 @@
+#encoding=utf8
+-
+  seriel_com: "COM21"
+  bundrate: 9600 #·Ö±æÂÊ
+  timeout: 100  #³¬Ê±
+
+-
+  other: reserved
+
+

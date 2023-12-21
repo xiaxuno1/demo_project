@@ -19,4 +19,4 @@ def yaml_load(path):
 if __name__ == '__main__':
     user_data = yaml_load('./data.yaml')
     print(type(user_data))
-    print(user_data[0])
+    print(user_data)

@@ -15,8 +15,8 @@ from tcp_client.yaml_read import yaml_load
 yaml_data = yaml_load("./data.yaml")
 data = []
 tcpclient = socket(AF_INET,SOCK_STREAM)
-tcpclient.bind(("0.0.0.0",6065))  #这里指定了client绑定的port
-host = '172.16.32.116'
+tcpclient.bind(("0.0.0.0",6060))  #这里指定了client绑定的port
+host = '172.16.32.115'
 port = 7778
 tcpclient.connect((host,port))
 while True:
