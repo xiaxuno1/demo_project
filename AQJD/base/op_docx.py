@@ -31,19 +31,29 @@ class DOCXOP(Singleton):
             runs = p.runs
             #这里主要是runs会随意分割一段，导致关键字无法找到，因此合并组合，然后替换
             for i ,run in enumerate(runs):#记录关键字分割的位置，方便替换
-                if run.text == "#":
+                #print(run.text)
+                if "#" in run.text: #关键字标记
                     count = i  #记录关键字起始位置
-                    tmp = "#"
+                    pre_partial = run.text[:run.text.find("#")]
+                    tmp = run.text[run.text.find("#"):]  #找出关键字的部分，可能全，可能不全，可能超出
                     while tmp not in list(replace_keyword_dic.keys()):
                         count = count+1
                         if count+1>len(runs):  #超出段落分割数量，没有匹配到关键字，退出循环
-                            print("关键字没有在传入key找到找到，所段在内容为：",tmp)
+                            #判断是否是第一次找到的关键字就超出真正关键字长度
+                            unmatch_count = 0  #记录未匹配次数，判断是否满足条件
+                            for key in replace_keyword_dic.keys():
+                                if key in tmp:
+                                    runs[i].text = runs[i].text.replace(runs[i].text,pre_partial+replace_keyword_dic[key]+
+                                                                        tmp[tmp.find("key")+len(key)+1:]) #runs[i]= 前缀+关键字+后缀
+                                    break
+                                unmatch_count = unmatch_count+1
+                            if unmatch_count>=len(replace_keyword_dic.keys()): #没有匹配到，提示
+                                print("关键字没有在传入key找到，所在内容为：",tmp)
                             break
                         tmp = tmp+runs[count].text
                         runs[count].clear()  #这里有问题是如果关键字没有找到也会执行清空
                     if count+1<=len(runs):  #超过了分割数量还没有匹配上关键字，就替换
-                        runs[i].text = runs[i].text.replace(runs[i].text,replace_keyword_dic[tmp])
-
+                        runs[i].text = runs[i].text.replace(runs[i].text,pre_partial+replace_keyword_dic[tmp])
 
     #通过段落替换，会丢失样式
     def replace_paragraphs(self,keyword,replace_keyword):
@@ -70,12 +80,36 @@ class DOCXOP(Singleton):
         table.cell(loc[0],loc[1]).text = cell
         table.cell(loc[0],loc[1]).text = cell
 
-    # 遍历表内容
-    def print_table(self,table_index):
+    # 按照行遍历表内容
+    def table_contents_row(self,table_index):
+        """
+        根据表索引，按照行的方式遍历，返回list
+        :param table_index:
+        :return: 行组成的list
+        """
+        contents = [] #全体内容
         table = self.doc.tables[table_index] #获取指定索引表格
         for row in table.rows:
+            content = []  #行内容列表
             for cell in row.cells:
-                print(cell.text)
+                content.append(cell.text)
+            contents.append(content)
+        return contents
+
+    # 按照列遍历表内容
+    def table_contents_col(self,table_index):
+        """
+        根据表索引，按照列的方式遍历，返回list
+        :param table_index:
+        :return: 行组成的list
+        """
+        contents = [] #全体内容
+        table = self.doc.tables[table_index] #获取指定索引表格
+        for col in table.cols:
+            content = []  #列内容列表
+            for cell in col.cells:
+                content.append(cell.text)
+        return contents
 
     # 打印docx内容
     def print_docx(self):

@@ -7,7 +7,7 @@
 # DATA: 2023/2/28
 # Description:配置文件的读取操作 .ini文件
 # ---------------------------------------------------
-import config,configparser
+import configparser
 from BjlxBS.base.function import project_path
 
 class INIOp:

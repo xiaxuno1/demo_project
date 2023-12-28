@@ -8,13 +8,15 @@
 # Description:生成遍历测试报告
 # ---------------------------------------------------
 import os,time
+import shutil
 
 from AQJD.base.op_docx import DOCXOP
 from AQJD.base.excel_op import ExcelOP
 from AQJD.base.cfg_info import CFGInfo
+from AQJD.base.document_convert import *
+from AQJD.base.search_file import file_copy2
 
 station_path ="E:\\配置文件过程库\\10型以前车站\\10型增加安全监督\\输出配置文件"
-station_info_path = "E:\\配置文件过程库\\10型以前车站\\10型增加安全监督\\项目管理.xlsx"
 
 def check_file_exsits(path,file_keyword):
     '''
@@ -43,9 +45,8 @@ def report_info(station_path,station_code,xl_rows):
     equi_list_path = check_file_exsits(station_path,"设备列表.xlsx")
     for row in xl_rows:
         if row[2].lower() == station_code.lower(): #查找对应站码，不区分大小写
-            return (alarm_record_path,equi_list_path,row[1],row[2],row[7],row[9],row[10],row[11],row[14],row[15])
-    return (alarm_record_path,equi_list_path,-1,-1,-1,-1,-1,-1,-1,-1)
-
+            return (alarm_record_path,equi_list_path,row[1],row[2],row[7],row[9],row[11],row[12],row[14],row[15])
+    return (alarm_record_path,equi_list_path,-1,-1,-1,-1,-1,-1,-1,-1,-1)
 
 #获取基础信息
 def create_docx_main(row):
@@ -114,22 +115,35 @@ def create_docx_main(row):
     keyword_dic["#道岔情况"] = dc_situation
     keyword_dic["#塞分区数量"] = str(longest_block)+"个"
     keyword_dic["#进路数量"] = str(route_num)+"条"
+    test_result = "   在室内仿真测试平台，根据《铁路信号集中监测系统功能补强专项整治测试大纲》中测试案例的相关技术要求，" \
+                  "完成了2010型铁路信号集中监测的7项功能测试的遍历场景测试。详细内容见《"+station_name+"-测试大纲》。"+"\n" \
+                  "   受试系统设备所测试项目符合《铁路信号集中监测系统功能补强专项整治测试大纲》中规定的相关技术要求。"
     doc_file = DOCXOP(".\\data\\test_reporter.docx")
     doc_file.replace_paragraphs_by_run(keyword_dic)
     #填入测试项目汇总表格
     doc_file.fill_in_table(2,equip_list_info)
+    #根据设备列表，修改测试结论表格，读取测试结论中被测项目情况，测试项目内容在设备列表中查找，没有测试结论项标记为/
+    test_projects = doc_file.table_contents_row(3)
+    test_project_row_num = 0
+    for test_project in test_projects[1:]: #不要
+        test_project_row_num = test_project_row_num+1  #从1开始
+        count = 0  #记录未匹配到的次数
+        for equip_row in equip_list_info[1:]: #查看设备列表中是否有此报警，没有标记为/
+            if test_project[1][:-4] in equip_row[1]:  #eg：道岔总分表示不一致 in 4.1.道岔总分表示不一致_多动道岔
+                #print("匹配到了",equip_row[1])
+                break  #匹配到后就不再进行匹配
+            count = count+1
+        if count>=len(equip_list_info)-1: #表头不算
+            doc_file.fill_cell(3,(test_project_row_num,2),"/")  #设备列表中没有此报警
     #填写测试结论表格
     doc_file.fill_cell(4,(2,1),test_start_time) #填入时间
-
+    doc_file.fill_cell(4,(3,1),test_result) #填入测试结论
     #保存docx
     print("保存路径",save_path)
     doc_file.save_docx(save_path)
-    return 1
+    return save_path
 
 def create_all_test_report(path):
-    sheet = "10型新增安全监督信息表"
-    fp = open(".\\data\\test_result.txt", "w")
-
     listdir = os.listdir(path)  #path下所有的文件夹和文件，默认所有站配置都在path下，不存在在子目录下
     xl = ExcelOP(".\\data\\项目管理.xlsx", "10型新增安全监督信息表")
     xl_rows = xl.get_rows()
@@ -137,8 +151,41 @@ def create_all_test_report(path):
         loc = os.path.normpath(path + "\\" + dir)
         if os.path.isdir(loc): #判断目录
             info = report_info(loc,dir,xl_rows) #获取测试报告必要信息
-            create_docx_main(info)  #创建测试报告
-    fp.close()  #关闭打开文件
+            report_path = create_docx_main(info)  #创建测试报告,转换为pdf
+            #将测试大纲转换为pdf,只有重新生成测试报告才会转换
+            test_outlook = check_file_exsits(loc,"测试大纲.xlsx")
+            #测试报告更新时重新生成pdf
+            if test_outlook != -1 and os.path.isfile(report_path):  #找到了路径
+                #如果文件存在，就不重新生成
+                excel2pdf(test_outlook)
+            #将测试报告转换为pdf
+            if os.path.isfile(report_path):
+                docx2pdf_win32com(report_path)
+
+def create_output_test_report(path,dst_path):
+    """
+    生产输出的测试报告，复制四个文件形成新的
+    :param path:存放位置
+    :return:
+    """
+    listdir = os.listdir(path)  #path下所有的文件夹和文件，默认所有站配置都在path下，不存在在子目录下
+    xl = ExcelOP(".\\data\\项目管理.xlsx", "10型新增安全监督信息表")
+    xl_rows = xl.get_rows()
+    for dir in listdir:
+        loc = os.path.normpath(path + "\\" + dir)
+        test_outlook = check_file_exsits(loc, "测试大纲.pdf")
+        alarm_record = check_file_exsits(loc, "报警记录.xlsx")
+        test_record = check_file_exsits(loc, "测试记录.xlsx")
+        test_report = check_file_exsits(loc, "遍历测试报告.pdf")
+        if os.path.isfile(test_report):  #生成了报告
+            station_info = report_info(loc, dir, xl_rows)  # 获取车站信息
+            if not os.path.isdir(dst_path + "\\" + station_info[2]):
+                os.mkdir(dst_path + "\\" + station_info[2])
+            file_copy2(test_outlook, dst_path + "\\" + station_info[2])
+            file_copy2(alarm_record, dst_path + "\\" + station_info[2])
+            file_copy2(test_record, dst_path + "\\" + station_info[2])
+            file_copy2(test_report, dst_path + "\\" + station_info[2])
+
 
 #判断最后一个记录时间是否超出指定时间
 def is_outtime(path,sheet_name,index,dead_timestamp = 1701705600.0):
@@ -194,7 +241,6 @@ def change_all_outtime():
                 change_xl_time(alarm_record_path, "Sheet1", 5)
                 change_xl_time(alarm_record_path, "Sheet1", 6)
 
-
 #查找指定目录下的所有文件
 def serach_files(path,file_name):
     count = 0  #数量
@@ -209,6 +255,8 @@ def serach_files(path,file_name):
 if __name__ == '__main__':
     #change_all_outtime()  #修改超限时间
     create_all_test_report(station_path)
+    dst_path = "E:\\配置文件过程库\\10型以前车站\\10型增加安全监督\\10安全监督测试报告"  #测试报告输出目录
+    create_output_test_report(station_path,dst_path)
     #xl = ExcelOP(station_info_path,"10型新增安全监督信息表")
     #print(report_info(station_path + "\\MZG", "MZG", xl.get_rows()))
     #serach_files(station_path,"遍历测试报告.docx")

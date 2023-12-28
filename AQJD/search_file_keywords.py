@@ -39,7 +39,7 @@ def file_read(filename,encod):
             yield line
 
 def get_file_encoding(filepath):
-    """获取文件的编码方式"""
+    """获取文件的码方式"""
     with open(filepath, 'rb') as f:
         encoding = cchardet.detect(f.read())['encoding']
         if encoding in ["ISO-8859-1", "ASCII"]:
