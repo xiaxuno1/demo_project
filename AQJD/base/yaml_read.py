@@ -11,12 +11,12 @@ import yaml
 
 
 def yaml_load(path):
-    """读取yaml文件，返回list"""
+    """读取yaml文件，返回list，返回字典组成的列表，"""
     stream = open(path,"r",encoding='gbk')
     yaml_data = yaml.load(stream,Loader=yaml.FullLoader)
     return yaml_data
 
 if __name__ == '__main__':
-    user_data = yaml_load('./data.yaml')
-    print(type(user_data))
-    print(user_data[0])
+    user_data = yaml_load('..//data//cfg.yaml')
+    print(type(user_data[0]['rebuild_all']))
+    print(user_data[0]['rebuild_all'])

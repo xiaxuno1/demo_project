@@ -15,8 +15,11 @@ from AQJD.base.excel_op import ExcelOP
 from AQJD.base.cfg_info import CFGInfo
 from AQJD.base.document_convert import *
 from AQJD.base.search_file import file_copy2
+from AQJD.base.yaml_read import yaml_load
 
-station_path ="E:\\配置文件过程库\\10型以前车站\\10型增加安全监督\\输出配置文件"
+cfg_info = yaml_load(".//data//cfg.yaml")  #配置信息作为全局信息
+station_path = cfg_info[0]['station_path']
+
 
 def check_file_exsits(path,file_keyword):
     '''
@@ -59,9 +62,11 @@ def create_docx_main(row):
     save_path = os.path.dirname(row[0])+"\\四川网达科技有限公司集中监测系统功能补强"+station_name+"遍历测试报告.docx"
     #如果已经存在报告，不重新生成
     if  os.path.exists(save_path):
-        #print("已存在测试报告",save_path)
-        #pass
-        return 1
+        if cfg_info[0]['rebuild_all']: #是否设置全部重新生成
+            pass
+        else:
+            print("已存在测试报告，不生成",save_path)
+            return 1
     #获取车站信息
     if "四显示" in row[5]:
         ctcs_grade = "普速4显示"
@@ -255,7 +260,8 @@ def serach_files(path,file_name):
 if __name__ == '__main__':
     #change_all_outtime()  #修改超限时间
     create_all_test_report(station_path)
-    dst_path = "E:\\配置文件过程库\\10型以前车站\\10型增加安全监督\\10安全监督测试报告"  #测试报告输出目录
+    dst_path = cfg_info[0]['output_test_report_pkg']  #测试报告输出目录
+    print("生成输出测试报告...")
     create_output_test_report(station_path,dst_path)
     #xl = ExcelOP(station_info_path,"10型新增安全监督信息表")
     #print(report_info(station_path + "\\MZG", "MZG", xl.get_rows()))
