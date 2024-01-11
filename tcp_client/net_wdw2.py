@@ -7,7 +7,7 @@
 # DATA: 2022/9/29
 # Description:创建外电网的网口发送数据,接另两个外电网时
 # ---------------------------------------------------
-import time,base,base64
+import time,base64
 from socket import *
 from tcp_client.yaml_read import yaml_load
 
@@ -16,7 +16,7 @@ yaml_data = yaml_load("./data.yaml")
 data = []
 tcpclient = socket(AF_INET,SOCK_STREAM)
 tcpclient.bind(("0.0.0.0",6060))  #这里指定了client绑定的port
-host = '172.16.32.115'
+host = '172.16.30.213'
 port = 7778
 tcpclient.connect((host,port))
 while True:
@@ -26,7 +26,7 @@ while True:
         if "外电网" in yaml_data[i]['msg']:
             data = yaml_data[i]['wdw_data']['data']
             tcpclient.send(bytes.fromhex(data))
-            #print('发送成功')
+            #print('发送成功',data)
             time.sleep(1)
     #tcpclient.send(bytes.fromhex(data2))
     # data = 'hello ..你好'

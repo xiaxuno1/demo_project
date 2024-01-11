@@ -38,7 +38,7 @@ class ServerSocket:
 if __name__ == '__main__':
     yaml_data = yaml_load("./data.yaml")
     data = []
-    server = ServerSocket(5555)
+    server = ServerSocket(6060)
     addr,c = server.accept_msg()
     while True:
         for i in range(len(yaml_data)):
