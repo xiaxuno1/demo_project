@@ -50,6 +50,24 @@ class CFGTestReportModify:
         doc.page_header("2020型站机接入10中心配置文件测试报告")
         #修改测试报告名称
         doc.fill_cell(0,(0,0),"2020型站机接入10中心配置文件测试报告")
+        #修改软件版本 20230801之前终端0100，之后终端0101
+        contents1 = "站机V2.00.001.0100\n10中心：\n" \
+                   "   应用服务器V1.02.000.0100\n" \
+                   "   前置机V1.02.000.0100\n" \
+                   "   网管服务器V1.02.000.0100\n" \
+                   "   终端V1.02.002.0101\n" \
+                   "   时钟服务器V2.07.174"
+        contents2 = "站机V2.00.001.0100\n10中心：\n" \
+                   "   应用服务器V1.02.000.0100\n" \
+                   "   前置机V1.02.000.0100\n" \
+                   "   网管服务器V1.02.000.0100\n" \
+                   "   终端V1.02.002.0100\n" \
+                   "   时钟服务器V2.07.174"
+        if mad_date == "None" or int(mad_date)>=20230804:
+            doc.fill_cell(0, (4, 1), contents1, aligned="LEFT")
+        else:
+            doc.fill_cell(0, (4, 1), contents2, aligned="LEFT")
+
         #修改配置版本
         doc.fill_cell(0, (5, 1), station  + "-" + version)
         #修改站名
@@ -57,6 +75,13 @@ class CFGTestReportModify:
         doc.fill_cell(0,(6,len(doc.table_content_row(0,6))-1), station_zh)
         #修改制作时间
         doc.fill_cell(0,(7,len(doc.table_content_row(0,7))-1), date)
+        #检错提示
+        if (doc.table_content_row(0,7)[1] == "杜波\n") or (doc.table_content_row(0,7)[1] == "杜波"):
+            pass
+        else:
+            print(doc.table_content_row(0,7))
+        if doc.table_content_row(0,8)[0] !="依据标准":
+            print(doc.table_content_row(0,8))
         #重新生成 测试人等信息
         doc.create_test_data(0,(11,1),pic_path=[".\\data\\电子签名\\夏旭02.png",".\\data\\电子签名\\蒲国宇01.png",
                                                 ".\\data\\电子签名\\邓永亮.png"],date=date)
@@ -75,29 +100,35 @@ def main(list_path,cfg_path):
         if path is not False:
             list_dir = os.listdir(path)
             modify_status = [0,0,0,0]  #记录是否修改的列表[20to10V2,20to10V3,20to20V2,20to20V3]
-            """
+
             for dir in list_dir:
                 #批量修改生成测试报告
                 if "测试报告20to10V2.0.0.0.docx" in dir:
-                    #cfg.modify_docx(path+"\\"+dir,cfg_info,tp=("20to10","V2.0.0.0"))
-                    docx2pdf_win32com(path+"\\"+dir)  #转换为pdf
-                    modify_status[0]=modify_status[0]+1
-                    time.sleep(5)
+                    if  dir.startswith("~$"): #排除word缓存文件
+                        pass
+                    else:
+                        cfg.modify_docx(path+"\\"+dir,cfg_info,tp=("20to10","V2.0.0.0"))
+                        docx2pdf_win32com(path+"\\"+dir)  #转换为pdf
+                        modify_status[0]=modify_status[0]+1
+                        time.sleep(2)
                 elif "测试报告20to10V3.0.0.0.docx" in dir:
-                    #cfg.modify_docx(path+"\\"+dir,cfg_info,tp=("20to10","V3.0.0.0"))
-                    docx2pdf_win32com(path+"\\"+dir) #转换为pdf
-                    modify_status[1]=modify_status[1]+1
-                    time.sleep(5)
-            """
+                    if  dir.startswith("~$"):
+                        pass
+                    else:
+                        cfg.modify_docx(path+"\\"+dir,cfg_info,tp=("20to10","V3.0.0.0"))
+                        docx2pdf_win32com(path+"\\"+dir) #转换为pdf
+                        modify_status[1]=modify_status[1]+1
+                        time.sleep(2)
+
             #导出到指定的位置
             for dir in list_dir:
                 loc = "F:\\测试报告合集"
                 if "测试报告20to10V2.0.0.0.pdf" in dir:
                     shutil.copy2(path+"\\"+dir,loc)
-                    modify_status[0] = modify_status[0] + 1
+                    #modify_status[0] = modify_status[0] + 1
                 elif "测试报告20to10V3.0.0.0.pdf" in dir:
                     shutil.copy2(path+"\\"+dir,loc)
-                    modify_status[1]=modify_status[1]+1
+                    #modify_status[1]=modify_status[1]+1
 
             print(path,modify_status)
         else:

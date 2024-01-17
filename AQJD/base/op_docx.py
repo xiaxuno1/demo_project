@@ -109,11 +109,16 @@ class DOCXOP(Singleton):
         p3.add_run("                   日期：" + date)
 
     #在指定行列填写内容
-    def fill_cell(self,table_index,loc,cell):
+    def fill_cell(self,table_index,loc,cell,aligned = "CENTER"):
         table = self.doc.tables[table_index] #获取指定索引表格
         table.cell(loc[0],loc[1]).text = cell
         p = table.cell(loc[0],loc[1]).paragraphs[0]
-        p.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER  #设置段落对齐方式 居中
+        if aligned == "CENTER":
+            p.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER  #设置段落对齐方式默认 居中
+        elif aligned == "LEFT":
+            p.alignment = WD_PARAGRAPH_ALIGNMENT.LEFT  #设置段落对齐方式默认 居中
+        else:
+            p.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER  #设置段落对齐方式默认 居中
         p.style.font.name = 'Arial'
         # 设置中文字体
         p.style.element.rPr.rFonts.set(qn('w:eastAsia'), '宋体')
@@ -196,10 +201,7 @@ class DOCXOP(Singleton):
 
 if __name__ == '__main__':
     #create_table()
-    #doc = DOCXOP("..\\data\\cfg_test_report_20to10.docx")
-    doc = DOCXOP("..\\data\\test_report.docx")
-    for i in doc.table_contents_row(0):
-        print(i)
+    doc = DOCXOP("..\\data\\cfg_test_report_20to10.docx")
     #doc.print_docx()
     #'\n测试人：                   日期：\n\n确认人：                   日期：\n\n批准人：                   日期：'
     #doc.replace_paragraphs_by_run({"#时间段":"2023-11-28"})
@@ -210,7 +212,13 @@ if __name__ == '__main__':
     #doc.fill_in_table(0,)
     #删除指定页
     doc.page_header("2020型车站接入10中心CSM配置文件测试报告")
-    print(doc.table_content_row(0, 6))
-    doc.fill_cell(0, (0, 0), "2020型站机接入10中心配置文件测试报告")
+    print(doc.table_content_row(0, 4))
+    contents = "站机V2.00.001.0100\n10中心：\n" \
+               "   应用服务器V1.02.000.0100\n" \
+               "   前置机V1.02.000.0100\n" \
+               "   网管服务器V1.02.000.0100\n" \
+               "   终端V1.02.002.0101\n" \
+               "   时钟服务器V2.07.174"
+    doc.fill_cell(0, (4, 1), contents,aligned="LEFT")
     doc.save_docx("..\\data\\修改docx.docx")
         # print(d)
