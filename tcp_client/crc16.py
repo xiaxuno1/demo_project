@@ -81,8 +81,10 @@ class CRC16_XMODEM():
         return crc
 
 if __name__ == '__main__':
-    ls = '0E 03 00 04 00 01 00 01 00 01 00 01'
+    ls = '04 03 C0'+' 09 c4 03 69'*48
+    ls2 = "01 03 05 DC 00 60"
     #print(bytes.fromhex(ls))
+    print(ls)
     crc = crc16(ls)
     print(base64.b16encode(struct.pack('<H',crc)).decode()) #struct编码再转换
 
