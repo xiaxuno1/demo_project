@@ -7,6 +7,7 @@
 思路：
 次问题可以看做是顺序问题，
 采用栈的方式解决；顺序将左部分入栈，遇到右边部分即出栈
+这里用list实现栈
 """
 class Solution(object):
     def isValid(self, s):
