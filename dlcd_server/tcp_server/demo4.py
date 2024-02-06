@@ -34,7 +34,7 @@ class Client(threading.Thread):
     # If unable to, assume client has disconnected and remove him from server data
     # If able to and we get data back, print it in the server and send it back to every
     # client aside from the client that has sent it
-    # .decode is used to convert the byte data into a printable string
+    # .decode is used to convert the byte data into a printable str
     def run(self):
         while self.signal:
             try:

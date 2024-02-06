@@ -32,7 +32,7 @@ class ZDSet(Set):
         super(ZDSet,self).__init__()  #继承
         self.ip1 = '2000s' #重写ip的长度
     def zd_set_struct(self):
-        #Only the first character in the format string can be > to use big-endian:在开头定义模式
+        #Only the first character in the format str can be > to use big-endian:在开头定义模式
         strct_partt = '<'+self.num+self.ip1+self.port1 +self.code1+self.local_code+\
                       self.name_cn+self.code_id+self.version+self.release_time+self.sys_version
 

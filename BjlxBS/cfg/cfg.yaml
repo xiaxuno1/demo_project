@@ -1,8 +1,8 @@
 #encoding=utf8
 -
-  seriel_com: "COM21"
-  bundrate: 9600 #·Ö±æÂÊ
-  timeout: 100  #³¬Ê±
+  seriel_com: "COM18"
+  bundrate: 9600 #ï¿½Ö±ï¿½ï¿½ï¿½
+  timeout: 100  #ï¿½ï¿½Ê±
 
 -
   other: reserved
