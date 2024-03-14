@@ -260,10 +260,12 @@ def serach_files(path,file_name):
 if __name__ == '__main__':
     #change_all_outtime()  #修改超限时间
     create_all_test_report(station_path)
-    dst_path = cfg_info[0]['output_test_report_pkg']  #测试报告输出目录
-    print("生成输出测试报告...")
-    create_output_test_report(station_path,dst_path)
-    #xl = ExcelOP(station_info_path,"10型新增安全监督信息表")
-    #print(report_info(station_path + "\\MZG", "MZG", xl.get_rows()))
-    #serach_files(station_path,"遍历测试报告.docx")
+    #dst_path = cfg_info[0]['output_test_report_pkg']  #测试报告输出目录
+    #print("生成输出测试报告...")
+    #create_output_test_report(station_path,dst_path)
+    """
+    xl = ExcelOP(station_info_path,"10型新增安全监督信息表")
+    print(report_info(station_path + "\\MZG", "MZG", xl.get_rows()))
+    serach_files(station_path,"遍历测试报告.docx")
+    """
 

@@ -1,8 +1,8 @@
 #encoding=utf8
 -
   station_path: "E:\\配置文件过程库\\10型以前车站\\10型增加安全监督\\输出配置文件"  #读取配置文件的目录
-  rebuild_all: False #是否重新生成所有,bool
-  output_test_report_pkg: "E:\\配置文件过程库\\10型以前车站\\10型增加安全监督\\10安全监督测试报告" #打包所有测试报告的输出文职
+  rebuild_all: True #检查到存在测试报告是否重新生成True为是,bool，
+  output_test_report_pkg: "E:\\配置文件过程库\\10型以前车站\\10型增加安全监督\\10安全监督测试报告" #打包所有测试报告的输出位置
 
 -
   other: reserved
