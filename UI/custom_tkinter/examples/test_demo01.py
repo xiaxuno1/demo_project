@@ -1,12 +1,6 @@
-# --------------------------------------------------
-# coding=utf8
-# !/usr/bin/python
-# PN: test_tool
-# FN: app
-# Author: xiaxu
-# DATA: 2023/9/27
-# Description:UI
-# ---------------------------------------------------
+"""
+
+"""
 from tkinter import StringVar
 import tkinter
 import customtkinter
@@ -20,13 +14,13 @@ class App(customtkinter.CTk):
         super().__init__()
 
         # configure window
-        self.title("test_doemo") #标题
+        self.title("接口仿真demo") #标题
         self.geometry(f"{1100}x{580}") #尺寸
 
         # configure grid layout (4x4)
-        # grid整体的布局，weight权重 决定了多大如1/2
+        # grid整体的布局，weight权重 有多少额外的空间在行/列中
         self.grid_columnconfigure(1, weight=1)
-        self.grid_columnconfigure((2, 3), weight=0)
+        self.grid_columnconfigure((2, 3), weight=1)
         self.grid_rowconfigure((0, 1, 2), weight=1)
 
         # create sidebar frame with widgets
