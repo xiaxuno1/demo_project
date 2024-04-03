@@ -7,13 +7,50 @@
 # DATA: 2023/9/27
 # Description:UI
 # ---------------------------------------------------
+import os
 from tkinter import StringVar
 import tkinter
 import customtkinter
+from BjlxBS.base.cfg_info import CFGInfo
 
 #设置系统显示主题和显示模式
+from PIL import Image
+
 customtkinter.set_appearance_mode("System")  # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_default_color_theme("blue")  # Themes: "blue" (standard), "green", "dark-blue"
+
+class ScrollableLabelButtonFrame(customtkinter.CTkScrollableFrame):
+    #带有lable名称和button的滚动条框架
+    def __init__(self, master, command=None, **kwargs):
+        super().__init__(master, **kwargs)
+        self.grid_columnconfigure(0, weight=1)
+
+        self.command = command
+        self.radiobutton_variable = customtkinter.StringVar()
+        self.label_list = []
+        self.button_list = []
+
+    def add_item(self, label_text,button_text, image=None):
+        # compound 图像位置（上下左右）， anchor 文字位置 padx 在文本x方形增加额外空间（左，右）
+        label = customtkinter.CTkLabel(self, text=label_text, image=image, compound="left", padx=5, anchor="w")
+        #button
+        button = customtkinter.CTkButton(self, text=button_text, width=100, height=24)
+        if self.command is not None:
+            button.configure(command=lambda: self.command(label_text))
+        #sticky 如果cell更大，将粘贴在那里（方向） "n", "ne", "e", "se", "s", "sw", "w", "nw", "center"
+        label.grid(row=len(self.label_list), column=0, pady=(0, 10), sticky="w")
+        button.grid(row=len(self.button_list), column=1, pady=(0, 10), padx=5)
+        self.label_list.append(label)
+        self.button_list.append(button)
+
+    def remove_item(self, item):
+        for label, button in zip(self.label_list, self.button_list):
+            if item == label.cget("text"):
+                label.destroy()
+                button.destroy()
+                self.label_list.remove(label)
+                self.button_list.remove(button)
+                return
 
 class App(customtkinter.CTk):
     def __init__(self):
@@ -57,120 +94,22 @@ class App(customtkinter.CTk):
         self.scaling_optionemenu.set("100%")
         self.scaling_optionemenu.grid(row=8, column=0, padx=20, pady=(10, 20))
 
-        # create main entry and button
-        #输入框
-        self.entry = customtkinter.CTkEntry(self, placeholder_text="试试输入一些词")
-        self.entry.grid(row=3, column=1, columnspan=2, padx=(20, 0), pady=(20, 20), sticky="nsew")
-        self.main_button_1 = customtkinter.CTkButton(master=self, fg_color="transparent", border_width=2, text_color=("gray10", "#DCE4EE"),command=self.input_event)
-        self.main_button_1.grid(row=3, column=3, padx=(20, 20), pady=(20, 20), sticky="nsew")
-
-        # create textbox
-        # CTkTextbox 文本框，功能为向里写入文本，可以设置字体、大小、颜色、背景等
-        self.textbox = customtkinter.CTkTextbox(self, width=250)
-        self.textbox.grid(row=0, column=1, padx=(20, 0), pady=(20, 0), sticky="nsew")
-
-        # create tabview
-        # CTkTabview 表视图结构
-        self.tabview = customtkinter.CTkTabview(self, width=250)
-        self.tabview.grid(row=0, column=2, padx=(20, 0), pady=(20, 0), sticky="nsew")
-        self.tabview.add("CTkTabview")
-        self.tabview.add("Tab 2")
-        self.tabview.add("Tab 3")
-        self.tabview.tab("CTkTabview").grid_columnconfigure(0, weight=1)  # configure grid of individual tabs
-        self.tabview.tab("Tab 2").grid_columnconfigure(0, weight=1)
-        # 表中指定sheet配置CTkOptionMenu,设置CTkOptionMenu的显示名字
-        self.optionmenu_1 = customtkinter.CTkOptionMenu(self.tabview.tab("CTkTabview"), dynamic_resizing=False,
-                                                        values=["Value 1", "Value 2", "Value Long Long Long"])
-        self.optionmenu_1.set("CTkOptionMenu")
-        self.optionmenu_1.grid(row=0, column=0, padx=20, pady=(20, 10))
-        #表中指定sheet配置CTkComboBox
-        self.combobox_1 = customtkinter.CTkComboBox(self.tabview.tab("CTkTabview"),
-                                                    values=["Value 1", "Value 2", "Value Long....."])
-        self.combobox_1.set("CTkComboBox")
-        self.combobox_1.grid(row=1, column=0, padx=20, pady=(10, 10))
-        self.string_input_button = customtkinter.CTkButton(self.tabview.tab("CTkTabview"), text="Open CTkInputDialog",
-                                                           command=self.open_input_dialog_event)
-        self.string_input_button.grid(row=2, column=0, padx=20, pady=(10, 10))
-        self.label_tab_2 = customtkinter.CTkLabel(self.tabview.tab("Tab 2"), text="CTkLabel show on Tab 2")
-        self.label_tab_2.grid(row=0, column=0, padx=20, pady=20)
-
-        # create radiobutton frame
-        # 圆形按钮，可以给选中赋值、触发事件
-        self.radiobutton_frame = customtkinter.CTkFrame(self)
-        self.radiobutton_frame.grid(row=0, column=3, padx=(20, 20), pady=(20, 0), sticky="nsew")
-        self.radio_var = tkinter.IntVar(value=0)
-        self.label_radio_group = customtkinter.CTkLabel(master=self.radiobutton_frame, text="CTkRadioButton Group:")
-        self.label_radio_group.grid(row=0, column=2, columnspan=1, padx=10, pady=10, sticky="")
-        self.radio_button_1 = customtkinter.CTkRadioButton(master=self.radiobutton_frame, variable=self.radio_var, value=0)
-        self.radio_button_1.grid(row=1, column=2, pady=10, padx=20, sticky="n")
-        self.radio_button_2 = customtkinter.CTkRadioButton(master=self.radiobutton_frame, variable=self.radio_var, value=1)
-        self.radio_button_2.grid(row=2, column=2, pady=10, padx=20, sticky="n")
-        self.radio_button_3 = customtkinter.CTkRadioButton(master=self.radiobutton_frame, variable=self.radio_var, value=2)
-        self.radio_button_3.grid(row=3, column=2, pady=10, padx=20, sticky="n")
-
-        # create slider and progressbar frame
-        #进度条组件
-        self.slider_progressbar_frame = customtkinter.CTkFrame(self, fg_color="transparent")
-        self.slider_progressbar_frame.grid(row=1, column=1, padx=(20, 0), pady=(20, 0), sticky="nsew")
-        self.slider_progressbar_frame.grid_columnconfigure(0, weight=1)
-        self.slider_progressbar_frame.grid_rowconfigure(4, weight=1)
+        #信息显示框 ctk_tabveiw
+        self.info_frame = customtkinter.CTkScrollableFrame(self)
+        self.info_frame.grid(row = 0,column=1,padx=(20, 20), pady=(20, 0), sticky="nsew")
         #段按钮组件 CTkSegmentedButton
-        self.seg_button_1 = customtkinter.CTkSegmentedButton(self.slider_progressbar_frame)
-        self.seg_button_1.grid(row=0, column=0, padx=(20, 10), pady=(10, 10), sticky="ew")
-        #进度条组件CTkProgressBar
-        self.progressbar_1 = customtkinter.CTkProgressBar(self.slider_progressbar_frame)
-        self.progressbar_1.grid(row=1, column=0, padx=(20, 10), pady=(10, 10), sticky="ew")
-        self.progressbar_2 = customtkinter.CTkProgressBar(self.slider_progressbar_frame)
-        self.progressbar_2.grid(row=2, column=0, padx=(20, 10), pady=(10, 10), sticky="ew")
-        #拖动条组件
-        self.slider_1 = customtkinter.CTkSlider(self.slider_progressbar_frame, from_=0, to=1, number_of_steps=4) #步距
-        self.slider_1.grid(row=3, column=0, padx=(20, 10), pady=(10, 10), sticky="ew") #东西布局，从左到右
-        self.slider_2 = customtkinter.CTkSlider(self.slider_progressbar_frame, orientation="vertical") #垂直方向
-        self.slider_2.grid(row=0, column=1, rowspan=5, padx=(10, 10), pady=(10, 10), sticky="ns")#在frame的
-        self.progressbar_3 = customtkinter.CTkProgressBar(self.slider_progressbar_frame, orientation="vertical")
-        self.progressbar_3.grid(row=0, column=2, rowspan=5, padx=(10, 20), pady=(10, 10), sticky="ns")
+        cfg = CFGInfo("..\\cfg_data\\BjlxSet1.ini").get_info("继电器开关量")
+        print(cfg)
+        for i in range(1,len(cfg)):
+            label = customtkinter.CTkLabel(self.info_frame,text=str(i))
+            label2 = customtkinter.CTkLabel(self.info_frame,text=cfg[i][1])
+            label3 = customtkinter.CTkLabel(self.info_frame,text=cfg[i][3])
+            button = customtkinter.CTkButton(self.info_frame,text =cfg[i][5],command=self.sidebar_button_event )
+            label.grid(row = i+1,column = 0,padx=(20, 20), pady=(10, 0), sticky="nsew")
+            label2.grid(row = i+1,column = 1,padx=(20, 20), pady=(10, 0), sticky="nsew")
+            label3.grid(row = i+1,column = 2,padx=(20, 20), pady=(10, 0), sticky="nsew")
+            button.grid(row = i+1,column = 3,padx=(20, 20), pady=(10, 0), sticky="nsew")
 
-        # create scrollable frame
-        # 滚动条组件frame
-        self.scrollable_frame = customtkinter.CTkScrollableFrame(self, label_text="CTkScrollableFrame")
-        self.scrollable_frame.grid(row=1, column=2, padx=(20, 0), pady=(20, 0), sticky="nsew")
-        self.scrollable_frame.grid_columnconfigure(0, weight=1)
-        self.scrollable_frame_switches = []
-        for i in range(100):
-            #开关组件CTkSwitch
-            switch = customtkinter.CTkSwitch(master=self.scrollable_frame, text=f"CTkSwitch {i}")
-            switch.grid(row=i, column=0, padx=10, pady=(0, 20))
-            self.scrollable_frame_switches.append(switch)
-
-        # create checkbox and switch frame
-        # 勾选框组件checkbox
-        self.checkbox_slider_frame = customtkinter.CTkFrame(self)
-        self.checkbox_slider_frame.grid(row=1, column=3, padx=(20, 20), pady=(20, 0), sticky="nsew")
-        self.checkbox_1 = customtkinter.CTkCheckBox(master=self.checkbox_slider_frame)
-        self.checkbox_1.grid(row=1, column=0, pady=(20, 0), padx=20, sticky="n")
-        self.checkbox_2 = customtkinter.CTkCheckBox(master=self.checkbox_slider_frame)
-        self.checkbox_2.grid(row=2, column=0, pady=(20, 0), padx=20, sticky="n")
-        self.checkbox_3 = customtkinter.CTkCheckBox(master=self.checkbox_slider_frame)
-        self.checkbox_3.grid(row=3, column=0, pady=20, padx=20, sticky="n")
-
-        # 设置默认值
-        self.sidebar_button_3.configure(state="disabled", text="Disabled CTkButton") #button设置为无法点击
-        self.checkbox_3.configure(state="disabled")
-        self.checkbox_1.select() #设置为选中
-        self.scrollable_frame_switches[0].select()
-        self.scrollable_frame_switches[4].select()
-        self.radio_button_3.configure(state="disabled")
-        self.appearance_mode_optionemenu.set("Dark")
-        self.scaling_optionemenu.set("100%")
-        self.optionmenu_1.set("CTkOptionmenu")
-        self.combobox_1.set("CTkComboBox")
-        self.slider_1.configure(command=self.progressbar_2.set)  #进度条随拖动条拖动
-        self.slider_2.configure(command=self.progressbar_3.set)
-        self.progressbar_1.configure(mode="indeterminate",indeterminate_speed=0.6) #设置进度条模式indeterminate未知进度
-        self.progressbar_1.start()
-        self.textbox.insert("0.0", "CTkTextbox\n\n" + "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.\n\n" * 20)
-        self.seg_button_1.configure(values=["CTkSegmentedButton", "Value 2", "Value 3"])
-        self.seg_button_1.set("Value 2")
 
     def open_input_dialog_event(self):
         dialog = customtkinter.CTkInputDialog(text="Type in a number:", title="CTkInputDialog")
@@ -189,7 +128,6 @@ class App(customtkinter.CTk):
     #定义输入事件
     def input_event(self):
         print("输入内容：",self.entry.get())  #get获取当前输入的内容
-
 
 
 
